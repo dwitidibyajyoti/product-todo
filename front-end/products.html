@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+
+<head>
+  <title>Product List</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/">My Website</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Add Product</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/products.html">Product List</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="container">
+    <h1>Product List</h1>
+
+    <div id="product-list" class="row">
+      <!-- Products will be displayed here -->
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      fetch('http://127.0.0.1:8000/api/product/show')
+        .then(response => response.json()) // Convert the response to JSON
+        .then(data => {
+          // Loop through the products and display them on the page
+
+
+          data?.data.forEach(product => {
+
+
+           
+
+            var newParagraph = $(`<span></span>`);
+            
+            let elementArray = [];
+            JSON.parse(product.product_image).forEach(image => {
+              console.log(`image`, image);
+
+              elementArray.push($(`<div class="carousel-item active"><img src="${`http://localhost:8000/uploads/${image}`}" alt="Image 1"></div>`));
+            })
+
+            newParagraph.append(...elementArray)
+            
+            $('#product-list').append(`
+            <div class="col-md-4">
+           <div class="card mb-4 box-shadow">
+             <img class="card-img-top" src="${product.product_image}" alt="Product image">
+             <div class="card-body">
+               <div id="myCarousel" class="carousel slide" data-ride="carousel">
+                 <ol class="carousel-indicators">
+                   <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                   <li data-target="#myCarousel" data-slide-to="1"></li>
+                   
+                 </ol>
+                 <div class="carousel-inner">${newParagraph.html()}</div>
+                 
+                 
+                 
+                 <a class="carousel-control-prev" href="#myCarousel" data-slide="prev">
+                   <span class="carousel-control-prev-icon"></span>
+                 </a>
+                 <a class="carousel-control-next" href="#myCarousel" data-slide="next">
+                   <span class="carousel-control-next-icon"></span>
+                 </a>
+               </div>
+               <p class="card-text">${product.product_description}</p>
+               <div class="d-flex justify-content-between align-items-center">
+               
+                 <div class="btn-group">
+                     <button class="btn btn-primary my-button" id="my-delete" data-id="${product.id}">Delete</button>
+                     <a href="http://${window.location.hostname}:${window.location.port}/edits-product.html?id=${product.id}">Edits</a>
+                 </div>
+                 <small class="text-muted">$${product.product_price}</small>
+               </div>
+             </div>
+           </div>
+         </div>
+            `);
+          });
+        })
+      .catch(error => {
+        console.log(error);
+      });
+
+
+      $(document).on('click', '#my-delete', function () {
+        var id = $(this).data('id');
+
+        console.log(`id`, id);
+
+        $.ajax({
+          url: 'http://127.0.0.1:8000/api/product/delete/' + id,
+          method: 'DELETE',
+          crossDomain: true,
+          processData: false,
+          contentType: false,
+          success: function (response) {
+            alert('Product deleted successfully!');
+            // TODO: Update UI to reflect the deleted product
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            alert('Error deleting product: ' + errorThrown);
+          }
+        });
+      });
+    });
+
+  </script>
+
+</body>
+
+</html>

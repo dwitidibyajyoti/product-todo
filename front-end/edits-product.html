@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Product</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/">My Website</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Add Product</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/products.html">Product List</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="container mt-4">
+    <h1>Edit Product</h1>
+    <form id="edit-product-form">
+      <div class="form-group">
+        <label for="product-name">Product Name</label>
+        <input type="text" class="form-control" id="product-name" name="product_name" required>
+      </div>
+      <div class="form-group">
+        <label for="product-price">Product Price</label>
+        <input type="number" class="form-control" id="product-price" name="product_price" min="0.01" step="0.01"
+          required>
+      </div>
+      <div class="form-group">
+        <label for="product-description">Product Description</label>
+        <textarea class="form-control" id="product-description" name="product_description" rows="3" required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="product-image">Product Image</label>
+        <input type="file" class="form-control-file" id="product-image" name="product_images[]" accept="image/*">
+      </div>
+      <input type="hidden" id="product-id" name="product_id">
+      <button type="submit" class="btn btn-primary">Update Product</button>
+    </form>
+  </div>
+
+  <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script> -->
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+  <script>
+    $(document).ready(function () {
+
+
+      var urlParams = new URLSearchParams(window.location.search);
+      var productId = urlParams.get('id');
+
+      // Fetch the product data from the server using AJAX
+
+
+      $.ajax({
+        url: 'http://127.0.0.1:8000/api/product/index/' + productId,
+        method: 'GET',
+        success: function (response) {
+          console.log(`response`, response?.data);
+          // Populate the form fields with the product data
+          $('#product-name').val(response?.data.product_name);
+          $('#product-price').val(response?.data.product_price);
+          $('#product-description').val(response?.data.product_description);
+          $('#product-id').val(response?.data.id);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          alert('Error fetching product data: ' + errorThrown);
+        }
+      });
+
+
+      $('#edit-product-form').submit(function (event) {
+        event.preventDefault();
+
+        // Send the form data to the server using AJAX
+        $.ajax({
+          url: `http://127.0.0.1:8000/api/product/update/${productId}`,
+          method: 'POST',
+          data: new FormData(this),
+          processData: false,
+          contentType: false,
+          success: function (response) {
+            console.log(`response`, response);
+            alert('Product added successfully!');
+            $('#edit-product-form')[0].reset(); // Clear the form
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            //  console.log(`response`,response );
+            alert('Error adding product: ' + errorThrown);
+          }
+        });
+      });
+
+
+    });
+
+
+
+
+
+
+  </script>
+</body>
+
+</html>

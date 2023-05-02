@@ -28,7 +28,8 @@ Route::group(['prefix' => 'product', 'middleware' => 'throttle:1000,10'], functi
 
 
     Route::post('/store', [ProductController::class, 'store']);
-    // Route::get('/show', [Product::class, 'show']);
-    Route::delete('/delete/{id}', [Product::class, 'destroy']);
-    Route::post('/update/{id}', [Product::class, 'update']);
+    Route::get('/show', [ProductController::class, 'index']);
+    Route::get('/index/{id}', [ProductController::class, 'show']);
+    Route::delete('/delete/{id}', [ProductController::class, 'destroy']);
+    Route::post('/update/{id}', [ProductController::class, 'update']);
 });
